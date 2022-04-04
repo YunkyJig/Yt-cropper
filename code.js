@@ -22,9 +22,9 @@ const handleScreenshot = () => {
     console.log(time)
 
     var canvas = document.createElement("canvas");
-	canvas.width = video.offsetWidth;
-	canvas.height = video.offsetHeight;
-    canvas.getContext('2d').drawImage(player, 0, 0, canvas.width, canvas.height);
+	canvas.width = square.offsetWidth;
+	canvas.height = square.offsetHeight;
+    canvas.getContext('2d').drawImage(player, square.offsetLeft, square.offsetTop, canvas.width, canvas.height, 0, 0, canvas.width, canvas.height);
     
     var downloadLink = document.createElement("a");
     downloadLink.download = randomTimestamp() + '.jpg';
@@ -33,7 +33,7 @@ const handleScreenshot = () => {
 		downloadLink.href = URL.createObjectURL(blob);
 		downloadLink.click();
     }
-        
+
     canvas.toBlob(async function (blob) {
         DownloadBlob(blob);
     }, 'image/' + 'jpeg')
@@ -54,7 +54,7 @@ function dragElement(elmnt) {
 
 
   const isMaxDimensions = () => {
-    if(elmnt.offsetWidth + elmnt.offsetLeft >= video.width) {
+    if(elmnt.offsetWidth + elmnt.offsetLeft >= video.width || elmnt.offsetHeight + elmnt.offsetTop >= video.height) {
         // console.log('ye')
         return true
     }
@@ -62,14 +62,15 @@ function dragElement(elmnt) {
   }
 
   function dragMouseDown(e) {
-    console.log(e)
+    // console.log(e)
     e = e || window.event;
     // get the mouse cursor position at startup:
     pos3 = e.clientX;
     pos4 = e.clientY;
     
-    console.log('x', pos3, 'y', pos4, 'left', pos3 - elmnt.offsetLeft, 'top', pos4 - elmnt.offsetTop)
+    // console.log('x', pos3, 'y', pos4, 'left', pos3 - elmnt.offsetLeft, 'top', pos4 - elmnt.offsetTop)
     if(pos3 - elmnt.offsetLeft > elmnt.offsetWidth - 20 && pos4 - elmnt.offsetTop > elmnt.offsetHeight - 20) {
+        document.onmousemove = resizeDrag;
         if(isMaxDimensions()) {
             // console.log('+++++yup')
             e.preventDefault()
@@ -105,6 +106,14 @@ function dragElement(elmnt) {
     // stop moving when mouse button is released:
     document.onmouseup = null;
     document.onmousemove = null;
+  }
+
+  const resizeDrag = (e) => {
+    if(isMaxDimensions()) {
+        square.requestPointerLock()
+        console.log('maxed')
+    }
+    return 
   }
 }
 
